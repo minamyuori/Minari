@@ -1,0 +1,208 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>minari's</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;min-height:100vh;display:grid;place-items:center;
+ background:radial-gradient(ellipse,#303346,#101116 75%);
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+ color:white;padding:20px
+}
+.phone{
+ width:min(390px,100%);height:min(780px,88dvh);
+ min-height:580px;position:relative;overflow:hidden;
+ border:7px solid #202126;border-radius:58px;
+ background:#333 url('https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=900&q=85') center/cover;
+ box-shadow:0 25px 80px #0009
+}
+.phone:before{
+ content:"";position:absolute;inset:0;
+ background:linear-gradient(#0002,#0001 40%,#0008);
+ pointer-events:none
+}
+.status{position:relative;display:flex;justify-content:space-between;
+ padding:23px 27px;font-size:14px;font-weight:600}
+.island{position:absolute;top:12px;left:50%;transform:translateX(-50%);
+ width:120px;height:35px;border-radius:30px;background:#000}
+.clock{text-align:center;position:relative;margin-top:32px}
+.date{font-size:17px;text-shadow:0 2px 5px #0006}
+.time{font-size:clamp(60px,18vw,91px);font-weight:200;
+ letter-spacing:-4px;line-height:1.15}
+.widgets{position:relative;padding:24px 18px}
+.card{
+ background:rgba(47,43,40,.78);backdrop-filter:blur(22px);
+ -webkit-backdrop-filter:blur(22px);border-radius:27px;
+ box-shadow:0 5px 18px #0002
+}
+.music{padding:17px;margin-bottom:15px}
+.song{display:flex;align-items:center;gap:13px}
+.album{width:68px;height:68px;object-fit:cover;border-radius:12px}
+.songinfo{flex:1;min-width:0}
+.songinfo b{display:block;font-size:16px}
+.songinfo small{display:block;margin-top:6px;color:#ddd}
+.dot{color:#83ec88;font-size:20px}
+.progress{height:4px;background:#aaa;border-radius:9px;margin:17px 3px 7px}
+.fill{height:100%;width:0;background:white;border-radius:9px}
+.duration{display:flex;justify-content:space-between;color:#ddd;font-size:12px}
+.controls{display:flex;align-items:center;justify-content:space-around;
+ margin-top:18px}
+.controls button{border:0;background:none;color:white;font-size:25px;cursor:pointer}
+.controls .play{font-size:32px}
+.notice{padding:13px 16px;margin-bottom:10px;cursor:pointer}
+.noticehead{display:flex;align-items:center;gap:8px;font-size:13px}
+.wa{background:#30ce65;border-radius:8px;padding:4px;font-size:17px}
+.now{margin-left:auto;color:#ddd}
+.sender{font-size:14px;font-weight:700;margin-top:8px}
+.message{font-size:13px;color:#eee;margin-top:3px}
+.bottom{position:absolute;bottom:17px;left:0;right:0;text-align:center}
+.hint{font-size:13px;text-shadow:0 1px 5px #000;margin-bottom:18px}
+.shortcuts{display:flex;justify-content:space-between;padding:0 26px}
+.shortcuts button{width:54px;height:54px;border:0;border-radius:50%;
+ color:white;background:#302b27cc;font-size:22px}
+.home{width:130px;height:5px;background:white;border-radius:9px;margin:22px auto 0}
+.heart{position:absolute;pointer-events:none;animation:rise 2s ease-out forwards}
+@keyframes rise{to{transform:translateY(-240px) rotate(30deg);opacity:0}}
+#secret{display:none;position:absolute;z-index:5;inset:0;background:#14141df2;
+ padding:35px 25px;text-align:center;align-content:center}
+#secret h2{font-weight:400}
+#secret p{line-height:1.8;color:#eee}
+#secret button{padding:12px 22px;border:0;border-radius:25px}
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+ <div class="status">
+  <span id="statusTime">23.52</span>
+  <span>5G ▮▮▮ ▰</span>
+ </div>
+ <div class="island"></div>
+
+ <div class="clock">
+  <div class="date" id="date">Selasa, 20 Oktober</div>
+  <div class="time" id="time">23.52</div>
+ </div>
+
+ <div class="widgets">
+  <div class="card music">
+   <div class="song">
+    <img class="album" id="album"
+     src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=200&q=80">
+    <div class="songinfo">
+     <b id="song">Journey Mercies</b>
+     <small id="artist">MARK</small>
+    </div>
+    <span class="dot">●</span>
+   </div>
+   <div class="progress"><div class="fill" id="fill"></div></div>
+   <div class="duration"><span id="elapsed">0:00</span><span id="remaining">−3:45</span></div>
+   <div class="controls">
+    <button id="prev" aria-label="Lagu sebelumnya">◀◀</button>
+    <button class="play" id="play" aria-label="Putar atau jeda">▶</button>
+    <button id="next" aria-label="Lagu berikutnya">▶▶</button>
+   </div>
+   <audio id="audio"></audio>
+  </div>
+
+  <div class="card notice" onclick="heart()">
+   <div class="noticehead"><span class="wa">☎</span><b>WhatsApp</b><span class="now">sekarang</span></div>
+   <div class="sender" id="sender1">Reinar Attala (Talent Jose)</div>
+   <div class="message" id="msg1">Lagi apa? Saya lagi bosen nunggu nih</div>
+  </div>
+
+  <div class="card notice" onclick="heart()">
+   <div class="noticehead"><span class="wa">☎</span><b>WhatsApp</b><span class="now">sekarang</span></div>
+   <div class="sender" id="sender2">Jerome (bukan Polin)</div>
+   <div class="message" id="msg2">ngopi yuk cuuuy</div>
+  </div>
+ </div>
+
+ <div class="bottom">
+  <div class="hint" onclick="showSecret()">⌃ &nbsp; Geser ke atas untuk membuka</div>
+  <div class="shortcuts">
+   <button onclick="heart()">⌁</button>
+   <button onclick="showSecret()">◎</button>
+  </div>
+  <div class="home" onclick="showSecret()"></div>
+ </div>
+
+ <div id="secret">
+  <div style="font-size:48px">♡</div>
+  <h2>For you, sayang.</h2>
+  <p>
+   Di antara banyak hal yang terjadi hari ini,
+   kamu tetap jadi salah satu hal favoritku.
+   <br><br>
+   Thank you for being here. I hope you know
+   how special you are to me. ♡
+  </p>
+  <button onclick="closeSecret()">Kembali ♡</button>
+ </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+function updateClock(){
+ const d = new Date();
+ $('time').textContent = d.toLocaleTimeString('id-ID',{
+  hour:'2-digit',minute:'2-digit',hour12:false
+ }).replace('.',':');
+ $('statusTime').textContent = $('time').textContent;
+ $('date').textContent = d.toLocaleDateString('id-ID',{
+  weekday:'long',day:'numeric',month:'long'
+ });
+}
+updateClock();
+setInterval(updateClock,1000);
+
+function heart(){
+ const el=document.createElement('span');
+ el.className='heart';
+ el.textContent=['♡','♥','💗','✨'][Math.floor(Math.random()*4)];
+ el.style.left=(15+Math.random()*70)+'%';
+ el.style.top=(40+Math.random()*35)+'%';
+ el.style.fontSize=(20+Math.random()*25)+'px';
+ $('phone').appendChild(el);
+ setTimeout(()=>el.remove(),2100);
+}
+
+function showSecret(){
+ $('secret').style.display='grid';
+ heart();
+}
+function closeSecret(){ $('secret').style.display='none'; }
+
+const audio=$('audio');
+$('play').onclick=async()=>{
+ if(!audio.src){
+  alert('Tambahkan URL file musik MP3 di kode JavaScript terlebih dahulu.');
+  return;
+ }
+ if(audio.paused){
+  try{await audio.play();$('play').textContent='Ⅱ'}
+  catch(e){alert('Musik tidak dapat diputar. Periksa URL audio.')}
+ }else{
+  audio.pause();$('play').textContent='▶';
+ }
+};
+audio.ontimeupdate=()=>{
+ if(!audio.duration)return;
+ $('fill').style.width=(audio.currentTime/audio.duration*100)+'%';
+ $('elapsed').textContent=fmt(audio.currentTime);
+ $('remaining').textContent='−'+fmt(audio.duration-audio.currentTime);
+};
+audio.onended=()=> $('play').textContent='▶';
+function fmt(s){
+ s=Math.max(0,Math.floor(s));
+ return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+}
+$('next').onclick=()=>heart();
+$('prev').onclick=()=>heart();
+</script>
+</body>
+</html>
